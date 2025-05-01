@@ -308,5 +308,5 @@ Icebergテーブルからデータをエクスポートして、他のシステ�
 ## 参考資料
 
 - [Apache Iceberg 公式ドキュメント](https://iceberg.apache.org/)
-- [AWS Glue ドキュメント](https://docs.aws.amazon.com/glue/)
+- [Docker コンテナを使って AWS Glue 5.0 のジョブをローカルで開発・テストする]([https://docs.aws.amazon.com/glue/](https://aws.amazon.com/jp/blogs/news/develop-and-test-aws-glue-5-0-jobs-locally-using-a-docker-container/))
 - [AWS Glue for Apache Iceberg](https://docs.aws.amazon.com/glue/latest/dg/aws-glue-programming-etl-format-iceberg.html)
