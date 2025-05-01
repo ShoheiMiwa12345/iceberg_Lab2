@@ -1,4 +1,4 @@
-# AWS Glue 5.0 でのApache Iceberg 実践ガイド/ Qlik Answers Structured Data Using Case
+# AWS Glue 5.0 でのApache Iceberg 実践ガイド AddValue: Qlik Answers Structured Data Using Case
 
 ## はじめに
 
