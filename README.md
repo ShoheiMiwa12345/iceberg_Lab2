@@ -1,4 +1,5 @@
-# AWS Glue 5.0 でのApache Iceberg 実践ガイド AddValue: Qlik Answers Structured Data Using Case
+# AWS Glue 5.0 でのApache Iceberg 実践ガイド 
+## AddValue: Qlik Answers Structured Data Using Case
 
 ## はじめに
 
@@ -292,6 +293,38 @@ Icebergテーブルからデータをエクスポートして、他のシステ�
 
 ### 特定バージョンのデータエクスポート
 スナップショットIDを指定して特定時点のデータをエクスポートします
+
+# Qlik Cloud 上から必要なリソースの作成
+"データ接続の作成" から Iceberg テーブルからエクスポートしたデータ先となる S3バケットの接続を作成します。
+
+![image](https://github.com/user-attachments/assets/4968e2aa-21e7-418f-89a2-149a7854b6c9)
+
+リポジトリ内のScript(**Script.qvf**) をインポート、またはデータフローを開き、txt 変換を実施します。
+
+![image](https://github.com/user-attachments/assets/8f11db91-3e07-4092-81f2-1277e36fd09c)
+
+![image](https://github.com/user-attachments/assets/3916d36a-98bd-4492-a92f-62c93cdd30b4)
+
+# Qlik Answers KB(Knowleage Base) を作成し、PDF と txt のインデキシング
+リポジトリ内にある ***customer-feedback-report.pdf*** をKBへアップロードします。
+先ほどテキスト出力したバケットをセットします。
+インデックス化を実施します。
+
+
+![image](https://github.com/user-attachments/assets/7434907c-d90c-4602-9d23-cdb10694c1a7)
+
+# Qlik Answers Structured Data Using Case
+アシスタントを作成し、質問を投げて、非構造化データと構造化データを統合的に解釈した回答を得ます。
+
+
+![image](https://github.com/user-attachments/assets/b38212b1-2fb9-4c69-97e7-bf446a3640ad)
+
+
+![image](https://github.com/user-attachments/assets/a6ec9505-11c2-45d6-b190-b57323aca3c8)
+
+![image](https://github.com/user-attachments/assets/d6b7db52-a021-4188-a9d1-90b4c4c0745b)
+
+
 
 ## まとめ
 
