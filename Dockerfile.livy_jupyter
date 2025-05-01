@@ -1,0 +1,42 @@
+# AWS Glue 5.0 コンテナイメージをベースにする
+FROM public.ecr.aws/glue/aws-glue-libs:5 AS glue-base 
+
+# 必要な環境変数を設定
+ENV LIVY_SERVER_JAVA_OPTS="--add-opens java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/sun.nio.cs=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED"
+
+# Livy をダウンロード
+ADD --chown=hadoop:hadoop https://dlcdn.apache.org/incubator/livy/0.8.0-incubating/apache-livy-0.8.0-incubating_2.12-bin.zip ./
+
+# Livy をインストール・設定
+RUN unzip apache-livy-0.8.0-incubating_2.12-bin.zip && \
+    rm apache-livy-0.8.0-incubating_2.12-bin.zip && \
+    mv apache-livy-0.8.0-incubating_2.12-bin livy && \
+    mkdir -p livy/logs && \
+    echo "livy.server.host = 0.0.0.0\nlivy.server.port = 8998\nlivy.spark.master = local\nlivy.repl.enable-hive-context = true\nlivy.spark.scala-version = 2.12" > livy/conf/livy.conf && \
+    echo "log4j.rootCategory=INFO,console\nlog4j.appender.console=org.apache.log4j.ConsoleAppender\nlog4j.appender.console.target=System.err\nlog4j.appender.console.layout=org.apache.log4j.PatternLayout\nlog4j.appender.console.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n\nlog4j.logger.org.eclipse.jetty=WARN" > livy/conf/log4j.properties
+
+# 必要なパッケージをインストール
+USER root
+RUN dnf update -y && dnf install -y krb5-devel gcc python3.11-devel
+USER hadoop
+
+# SparkMagic と JupyterLab をインストール
+RUN export PATH=$HOME/.local/bin:$HOME/livy/bin/:$PATH && \
+    printf "numpy<2\nIPython<=7.14.0\n" > /tmp/constraint.txt && \
+    pip3.11 --no-cache-dir install --constraint /tmp/constraint.txt --user pytest boto==2.49.0 jupyterlab==3.6.8 IPython==7.14.0 ipykernel==5.5.6 ipywidgets==7.7.2 sparkmagic==0.21.0 jupyterlab_widgets==1.1.11 && \
+    jupyter-kernelspec install --user $(pip3.11 --no-cache-dir show sparkmagic | grep Location | cut -d" " -f2)/sparkmagic/kernels/sparkkernel && \
+    jupyter-kernelspec install --user $(pip3.11 --no-cache-dir show sparkmagic | grep Location | cut -d" " -f2)/sparkmagic/kernels/pysparkkernel && \
+    jupyter server extension enable --user --py sparkmagic && \
+    echo -e "#!/usr/bin/env bash\nmkdir -p /home/hadoop/workspace/\nlivy-server start\nsleep 5\njupyter lab --no-browser --ip=0.0.0.0 --allow-root --ServerApp.root_dir=/home/hadoop/workspace/ --ServerApp.token='' --ServerApp.password=''" > /home/hadoop/.local/bin/entrypoint.sh
+
+# エントリポイントスクリプトに実行権限を与える
+RUN chmod +x /home/hadoop/.local/bin/entrypoint.sh
+
+# SparkMagic 設定ファイルを追加
+ADD --chown=hadoop:hadoop https://raw.githubusercontent.com/jupyter-incubator/sparkmagic/refs/heads/master/sparkmagic/example_config.json .sparkmagic/config.json
+
+# パスを更新
+ENV PATH=/home/hadoop/.local/bin:/home/hadoop/livy/bin/:$PATH
+
+# エントリポイントを設定
+ENTRYPOINT ["/home/hadoop/.local/bin/entrypoint.sh"]
